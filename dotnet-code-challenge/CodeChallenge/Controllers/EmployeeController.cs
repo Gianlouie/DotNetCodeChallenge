@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using CodeChallenge.Services;
@@ -57,6 +54,66 @@ namespace CodeChallenge.Controllers
             _employeeService.Replace(existingEmployee, newEmployee);
 
             return Ok(newEmployee);
+        }
+
+        [HttpGet]
+        [Route("~/api/employee/{id}/reportstructure")]
+        public IActionResult GetEmployeeReportingStructure(String id) 
+        {
+            _logger.LogDebug($"Received employee reporting structure for '{id}'");
+
+            var employee = _employeeService.GetById(id);
+
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            var reportingStructure = _employeeService.GetReportingStructure(employee);
+
+            return Ok(reportingStructure);
+        }
+
+        [HttpPost]
+        [Route("~/api/employee/compensation")]
+        public IActionResult CreateEmployeeCompensation([FromBody]Compensation compensation)
+        {
+            _logger.LogDebug($"Received compensation create request for '{compensation.EmployeeId} {compensation.EmployeeId}'");
+
+            var employee = _employeeService.GetById(compensation.EmployeeId);
+
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            _employeeService.CreateCompensation(compensation);
+
+            return CreatedAtRoute("getEmployeeCompensationById", new { id = compensation.EmployeeId }, compensation);
+        }
+
+
+        [HttpGet(Name = "getEmployeeCompensationById")]
+        [Route("~/api/employee/{id}/compensation")]
+        public IActionResult GetEmployeeCompensation(String id)
+        {
+            _logger.LogDebug($"Received employee compensation request for '{id}'");
+
+            var employee = _employeeService.GetById(id);
+
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            var compensation = _employeeService.GetCompensationByEmployeeId(id);
+
+            if (compensation == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(compensation);
         }
     }
 }

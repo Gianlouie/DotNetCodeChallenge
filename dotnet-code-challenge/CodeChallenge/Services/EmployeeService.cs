@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CodeChallenge.Models;
 using Microsoft.Extensions.Logging;
 using CodeChallenge.Repositories;
@@ -58,6 +55,39 @@ namespace CodeChallenge.Services
             }
 
             return newEmployee;
+        }
+
+        public ReportingStructure GetReportingStructure(Employee employee)
+        {
+            ReportingStructure reportingStructure = null;
+
+            if (employee != null)
+            {
+                reportingStructure = new ReportingStructure(employee);
+            }
+
+            return reportingStructure;
+        }
+
+        public Compensation CreateCompensation(Compensation compensation)
+        {
+            if (compensation != null)
+            {
+                _employeeRepository.AddCompensation(compensation);
+                _employeeRepository.SaveAsync().Wait();
+            }
+
+            return compensation;
+        }
+
+        public Compensation GetCompensationByEmployeeId(string id)
+        {
+            if (!string.IsNullOrEmpty(id))
+            {
+                return _employeeRepository.GetCompensationByEmployeeId(id);
+            }
+
+            return null;
         }
     }
 }
